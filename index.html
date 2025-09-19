@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f4f4f9;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    input {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 6px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+    li {
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #fafafa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    li.done {
+      text-decoration: line-through;
+      color: gray;
+    }
+    @media(max-width: 500px) {
+      input {
+        width: 60%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>My To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Enter task">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskList = document.getElementById("taskList");
+    const taskInput = document.getElementById("taskInput");
+
+    // Load tasks from localStorage
+    window.onload = () => {
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      tasks.forEach(t => renderTask(t.text, t.done));
+    };
+
+    function addTask() {
+      let text = taskInput.value.trim();
+      if (text === "") return;
+      renderTask(text, false);
+      saveTasks();
+      taskInput.value = "";
+    }
+
+    function renderTask(text, done) {
+      let li = document.createElement("li");
+      li.textContent = text;
+      if (done) li.classList.add("done");
+
+      li.onclick = () => {
+        li.classList.toggle("done");
+        saveTasks();
+      };
+
+      let delBtn = document.createElement("button");
+      delBtn.textContent = "X";
+      delBtn.style.background = "red";
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        li.remove();
+        saveTasks();
+      };
+
+      li.appendChild(delBtn);
+      taskList.appendChild(li);
+    }
+
+    function saveTasks() {
+      let tasks = [];
+      document.querySelectorAll("li").forEach(li => {
+        tasks.push({ text: li.firstChild.textContent, done: li.classList.contains("done") });
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  </script>
+</body>
+</html>
